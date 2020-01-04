@@ -14,6 +14,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class RecordRobot extends CommandBase {
@@ -22,6 +23,8 @@ public class RecordRobot extends CommandBase {
   private boolean RECORDING;  // Boolean to end the function on button press
   private String DIRECTORY = "/home/lvuser/";  // Directory to ROBORIO
   private String OUTPUT_FILE;  // Output file name for movement
+
+  private double voltage;  // Current voltage of recording
 
   // Joysticks to record from (will be replaced with control maps)
   private Joystick driver = new Joystick(0);
@@ -40,6 +43,7 @@ public class RecordRobot extends CommandBase {
   public void initialize() {
     RECORDING = true;  // Reset the value of RECORDING every time the command is called
     frames = new JSONArray();  // Reset the JSON array each call
+    voltage = RobotController.getBatteryVoltage();  // Get current battery voltage
   }
 
 
@@ -61,7 +65,7 @@ public class RecordRobot extends CommandBase {
 
     JSONObject output_json = new JSONObject();  // Final output JSON object
 
-    output_json.put("voltage", 22);  // Output the voltage (for factor in voltage depletion)
+    output_json.put("voltage", this.voltage);  // Output the voltage (for factor in voltage depletion)
     output_json.put("frames", this.frames);  // Final array of frames to replay
 
     save_json(output_json, DIRECTORY + OUTPUT_FILE);  // Save the final JSONArray to directory in ROBORIO
