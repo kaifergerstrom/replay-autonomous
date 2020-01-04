@@ -24,8 +24,6 @@ public class RecordRobot extends CommandBase {
   private String DIRECTORY = "/home/lvuser/";  // Directory to ROBORIO
   private String OUTPUT_FILE;  // Output file name for movement
 
-  private double voltage;  // Current voltage of recording
-
   // Joysticks to record from (will be replaced with control maps)
   private Joystick driver = new Joystick(0);
   private Joystick gunner = new Joystick(1);
@@ -43,7 +41,6 @@ public class RecordRobot extends CommandBase {
   public void initialize() {
     RECORDING = true;  // Reset the value of RECORDING every time the command is called
     frames = new JSONArray();  // Reset the JSON array each call
-    voltage = RobotController.getBatteryVoltage();  // Get current battery voltage
   }
 
 
@@ -63,12 +60,10 @@ public class RecordRobot extends CommandBase {
   @Override
   public void end(boolean interrupted) {
 
-    JSONObject output_json = new JSONObject();  // Final output JSON object
 
-    output_json.put("voltage", this.voltage);  // Output the voltage (for factor in voltage depletion)
-    output_json.put("frames", this.frames);  // Final array of frames to replay
+    save_json(frames, DIRECTORY + OUTPUT_FILE);  // Save the final JSONArray to directory in ROBORIO
 
-    save_json(output_json, DIRECTORY + OUTPUT_FILE);  // Save the final JSONArray to directory in ROBORIO
+    System.out.println("Succesfully saved replay file!");
 
   }
 
@@ -80,7 +75,6 @@ public class RecordRobot extends CommandBase {
 
 
   /* ----- Custom Functions Below ----- */
-
 
   private JSONObject capture(Joystick[] joysticks)  {  // Input list of Joysticks to read from
 
@@ -112,7 +106,9 @@ public class RecordRobot extends CommandBase {
       joy_frame.put("axes", axes);
       joy_frame.put("pov", pov);
 
+      frame.put("voltage", RobotController.getBatteryVoltage());  // Get current battery voltage
       frame.put(joystick.getName(), joy_frame);  // Append the controller and its mapping to the current frame object
+      
       
     }
     
@@ -122,7 +118,7 @@ public class RecordRobot extends CommandBase {
 
 
   // Input final JSON array and save it to designated file path.
-  private void save_json(JSONObject json_object, String output_path) { 
+  private void save_json(JSONArray json_object, String output_path) { 
 
     try (FileWriter file = new FileWriter(output_path)) {
       file.write(json_object.toJSONString());

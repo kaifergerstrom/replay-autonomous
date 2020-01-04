@@ -7,34 +7,89 @@
 
 package frc.robot.commands.autonomous;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ReplayRobot extends CommandBase {
-  /**
-   * Creates a new ReplayRobot.
-   */
-  public ReplayRobot() {
-    // Use addRequirements() here to declare subsystem dependencies.
+  
+
+  private String DIRECTORY = "/home/lvuser/";  // Directory to ROBORIO
+  private String FILENAME;  // Output file name for movement
+
+  private boolean END_REPLAY = false;  // Boolean to end the function if neccesary
+
+  private JSONArray frames;  // Empty parser object to fetch information
+
+  
+  public ReplayRobot(String FILENAME) {
+    frames = parse_json(FILENAME);
   }
 
-  // Called when the command is initially scheduled.
+
   @Override
   public void initialize() {
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
+
   @Override
   public void execute() {
+
   }
 
-  // Called once the command ends or is interrupted.
+
   @Override
   public void end(boolean interrupted) {
   }
 
-  // Returns true when the command should end.
+
   @Override
   public boolean isFinished() {
-    return false;
+    return END_REPLAY;
   }
+
+
+  /* ----- Custom Functions Below ----- */
+
+  private JSONArray parse_json(String file_name) {
+
+    JSONParser jsonParser = new JSONParser();
+
+    try (FileReader reader = new FileReader(file_name)) {
+
+      Object obj = jsonParser.parse(reader);  // Parsed object from JSON
+      
+      return (JSONArray) obj;
+
+    } catch (FileNotFoundException e) {
+      System.out.println("File does not exist!");
+      END_REPLAY = true;
+      return null;
+    } catch (IOException e) {
+      System.out.println("Unable to read file!");
+      END_REPLAY = true;
+      return null;
+    } catch (ParseException e) {
+      System.out.println("Invalid JSON format!");
+      END_REPLAY = true;
+      return null;
+    }
+
+  }
+
+
+  // Get factor to multiply motor values to factor battery depletion
+  private double getVoltageCompensation(double current_voltage, double replay_voltage) {
+    return current_voltage / replay_voltage;
+  }
+
+
 }

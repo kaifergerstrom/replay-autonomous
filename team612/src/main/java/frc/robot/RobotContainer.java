@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final RecordRobot m_record = new RecordRobot("output.replay");
-  private final ReplayRobot m_autoCommand = new ReplayRobot();
+  private final ReplayRobot m_autoCommand = new ReplayRobot("output.replay");
 
 
 
