@@ -58,7 +58,14 @@ public class RecordRobot extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    save_json(frames, DIRECTORY + OUTPUT_FILE);  // Save the final JSONArray to directory in ROBORIO
+
+    JSONObject output_json = new JSONObject();  // Final output JSON object
+
+    output_json.put("voltage", 22);  // Output the voltage (for factor in voltage depletion)
+    output_json.put("frames", this.frames);  // Final array of frames to replay
+
+    save_json(output_json, DIRECTORY + OUTPUT_FILE);  // Save the final JSONArray to directory in ROBORIO
+
   }
 
 
@@ -111,10 +118,10 @@ public class RecordRobot extends CommandBase {
 
 
   // Input final JSON array and save it to designated file path.
-  private void save_json(JSONArray json_array, String output_path) { 
+  private void save_json(JSONObject json_object, String output_path) { 
 
     try (FileWriter file = new FileWriter(output_path)) {
-      file.write(json_array.toJSONString());
+      file.write(json_object.toJSONString());
     } catch (IOException e) {
       System.out.println("Unable to save JSON file");
     }
